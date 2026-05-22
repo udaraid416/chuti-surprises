@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Happy 2nd Month Anniversary, Chuti 💜</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --bg:            #050508;
+      --bg2:           #0a0a14;
+      --purple:        #8b2fc9;
+      --purple-light:  #bf5df0;
+      --magenta:       #d946ef;
+      --pink:          #f472b6;
+      --glow-purple:   rgba(139, 47, 201, 0.55);
+      --glow-magenta:  rgba(217, 70, 239, 0.45);
+      --glass-bg:      rgba(255, 255, 255, 0.04);
+      --glass-border:  rgba(255, 255, 255, 0.10);
+      --glass-shadow:  rgba(139, 47, 201, 0.25);
+      --text:          #f0e6ff;
+      --text-muted:    rgba(240, 230, 255, 0.55);
+      --radius:        20px;
+      --font-display:  'Great Vibes', cursive;
+      --font-body:     'Poppins', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--bg); color: var(--text); font-family: var(--font-body);
+      overflow: hidden; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased;
+    }
+
+    ::-webkit-scrollbar { width: 0; display: none; }
+    * { scrollbar-width: none; }
+
+    #particle-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+    /* PRELOADER */
+    #preloader {
+      position: fixed; inset: 0; z-index: 9999; background: var(--bg);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+    #preloader.hidden { opacity: 0; visibility: hidden; }
+
+    .preloader-heart i {
+      font-size: 64px; color: var(--magenta);
+      animation: heartbeat 1.2s ease-in-out infinite; filter: drop-shadow(0 0 18px var(--glow-magenta));
+    }
+    @keyframes heartbeat { 0%, 100% { transform: scale(1); } 14% { transform: scale(1.18); } 28% { transform: scale(1); } 42% { transform: scale(1.12); } }
+    .preloader-text { font-size: 0.9rem; letter-spacing: 0.18em; color: var(--text-muted); text-transform: uppercase; }
+
+    /* SCREEN SYSTEM */
+    #app { position: fixed; inset: 0; z-index: 1; }
+    .screen {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: clamp(20px, 6vw, 60px) clamp(16px, 5vw, 48px);
+      opacity: 0; visibility: hidden; transition: opacity 0.5s ease, visibility 0.5s ease;
+      overflow-y: auto; overflow-x: hidden;
+    }
+    .screen.active { opacity: 1; visibility: visible; }
+
+    /* LOCK SCREEN SPECIFIC */
+    #screen-lock { z-index: 5000; background: var(--bg); }
+    .lock-input {
+      width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--glass-border);
+      background: rgba(255, 255, 255, 0.05); color: #fff; font-family: var(--font-body); font-size: 1.1rem;
+      text-align: center; outline: none; margin-bottom: 20px; transition: all 0.3s ease;
+    }
+    .lock-input:focus { border-color: var(--magenta); box-shadow: 0 0 15px rgba(217, 70, 239, 0.4); }
+
+    /* NAV DOTS */
+    #nav-dots {
+      position: fixed; right: 16px; top: 50%; transform: translateY(-50%); z-index: 100;
+      display: flex; flex-direction: column; gap: 8px; opacity: 0; transition: opacity 0.6s ease;
+    }
+    #nav-dots.visible { opacity: 1; }
+    .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--glass-border); border: 1px solid rgba(255,255,255,0.2); cursor: pointer; transition: all 0.3s ease; }
+    .nav-dot.active { background: var(--magenta); box-shadow: 0 0 10px var(--glow-magenta); transform: scale(1.4); }
+
+    /* GLASS DESIGN */
+    .glass {
+      background: var(--glass-bg); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid var(--glass-border); border-radius: var(--radius); box-shadow: 0 8px 32px var(--glass-shadow);
+    }
+    .glow-text { text-shadow: 0 0 20px var(--glow-magenta), 0 0 60px rgba(139,47,201,0.4); }
+
+    /* BUTTONS & TITLES */
+    .section-title { font-family: var(--font-display); font-size: clamp(2rem, 9vw, 4rem); text-align: center; margin-bottom: 20px; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px; padding: 15px 38px; border-radius: 50px;
+      background: linear-gradient(135deg, var(--purple), var(--magenta)); border: none; color: #fff;
+      font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 0 30px var(--glow-purple); transition: all 0.2s ease;
+    }
+    .btn-primary:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 0 40px var(--glow-purple); }
+
+    /* SCREEN 1: HOME */
+    #screen-1 { gap: 32px; }
+    .landing-badge { font-size: 0.75rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--magenta); background: rgba(217,70,239,0.08); border: 1px solid rgba(217,70,239,0.25); border-radius: 50px; padding: 6px 20px; text-align: center; }
+    .landing-title { font-family: var(--font-display); font-size: clamp(2.6rem, 11vw, 6rem); text-align: center; line-height: 1.1; }
+    .landing-title .highlight { background: linear-gradient(135deg, var(--purple-light), var(--magenta), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .counter-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; width: 100%; max-width: 380px; margin: 0 auto; }
+    .counter-card { padding: 12px 2px; border-radius: 12px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .counter-num { font-size: clamp(1.1rem, 4.5vw, 1.8rem); font-weight: 700; background: linear-gradient(135deg, var(--purple-light), var(--magenta)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2; }
+    .counter-label { font-size: clamp(0.45rem, 2vw, 0.6rem); letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); margin-top: 2px; }
+
+    /* SCREEN 2: TIMELINE */
+    #screen-2 { justify-content: flex-start; padding-top: 60px; padding-bottom: 60px; }
+    .timeline { width: 100%; max-width: 480px; position: relative; padding-left: 36px; }
+    .timeline::before { content: ''; position: absolute; left: 11px; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, transparent, var(--purple), var(--magenta), transparent); }
+    .tl-item { position: relative; margin-bottom: 32px; opacity: 0; transform: translateX(-24px); transition: all 0.6s ease; }
+    .tl-item.visible { opacity: 1; transform: translateX(0); }
+    .tl-dot { position: absolute; left: -31px; top: 18px; width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--magenta)); border: 2px solid var(--bg); }
+    .tl-card { padding: 18px 20px; border-radius: 14px; }
+    .tl-date { font-size: 0.7rem; color: var(--magenta); font-weight: 600; margin-bottom: 4px; }
+    .tl-title { font-size: 1rem; font-weight: 600; margin-bottom: 4px; }
+    .tl-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.65; }
+
+    /* SCREEN 3: GALLERY */
+    .swiper-container-wrap { width: 100%; max-width: 520px; }
+    .swiper { width: 100%; padding: 30px 0 50px !important; }
+    .swiper-slide { width: 240px !important; height: 310px !important; border-radius: 18px; overflow: hidden; position: relative; }
+    .swiper-slide img { width: 100%; height: 100%; object-fit: cover; }
+    .slide-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(5,5,8,0.85), transparent 65%); display: flex; align-items: flex-end; padding: 16px; }
+
+    /* SCREEN 4: LOVE SCANNER */
+    .scanner-wrap { position: relative; margin: 30px auto; width: 160px; height: 160px; }
+    .fingerprint-btn {
+      width: 100%; height: 100%; border-radius: 50%; background: rgba(139, 47, 201, 0.05);
+      border: 3px solid var(--purple-light); display: flex; justify-content: center; align-items: center;
+      font-size: 5rem; color: var(--purple-light); box-shadow: 0 0 20px rgba(139, 47, 201, 0.3);
+      transition: all 0.3s; cursor: pointer; position: relative; overflow: hidden;
+      user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+    }
+    .fingerprint-btn.scanning { color: var(--magenta); border-color: var(--magenta); box-shadow: 0 0 50px var(--glow-magenta); animation: pulse-scan 1s infinite; }
+    .scan-line { position: absolute; width: 100%; height: 6px; background: var(--pink); box-shadow: 0 0 15px var(--pink), 0 0 30px var(--magenta); top: -10px; display: none; border-radius: 5px; }
+    .scanning .scan-line { display: block; animation: scanMove 1.5s infinite ease-in-out; }
+    @keyframes scanMove { 0% {top: -5%;} 50% {top: 100%;} 100% {top: -5%;} }
+    @keyframes pulse-scan { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+    /* SCREEN 5: MAGIC BALL */
+    .magic-ball-wrap { text-align: center; width: 100%; max-width: 450px; }
+    .magic-ball {
+      width: 180px; height: 180px; border-radius: 50%; margin: 0 auto 30px;
+      background: radial-gradient(circle at 30% 30%, #bf5df0, #4a156e, #1a0526);
+      display: flex; align-items: center; justify-content: center; font-size: 4rem; color: #fff;
+      box-shadow: 0 0 50px var(--glow-purple), inset -10px -10px 30px rgba(0,0,0,0.6);
+      cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative;
+    }
+    .magic-ball:active { transform: scale(0.9) rotate(15deg); box-shadow: 0 0 70px var(--glow-magenta); }
+    .reason-box {
+      min-height: 100px; padding: 20px; display: flex; align-items: center; justify-content: center;
+      font-size: 1.15rem; line-height: 1.6; font-weight: 500; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3);
+    }
+
+    /* SCREEN 6: SCRATCH CARD */
+    .scratch-card-wrapper { position: relative; width: 320px; height: 220px; margin: 20px auto 40px; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .scratch-base {
+      position: absolute; inset: 0; background: linear-gradient(135deg, #2d0b47, #66189a); border-radius: 18px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+      padding: 20px; border: 2px dashed var(--pink); z-index: 1;
+    }
+    .scratch-base h4 { color: var(--pink); font-size: 0.9rem; margin-bottom: 10px; letter-spacing: 2px; }
+    .scratch-base h2 { font-size: 1.6rem; color: #fff; text-shadow: 0 0 15px var(--glow-magenta); }
+    .scratch-canvas { position: absolute; inset: 0; z-index: 5; border-radius: 18px; cursor: pointer; touch-action: none; /* Prevents scrolling while scratching */ }
+
+    /* SCREEN 7: ENVELOPE */
+    .envelope-wrapper { position: relative; cursor: pointer; text-align: center; z-index: 20; padding: 20px; transition: all 0.5s; }
+    .envelope { width: 260px; height: 170px; background: #4a156e; border-radius: 8px; position: relative; display: inline-block; box-shadow: 0 15px 40px rgba(139,47,201,0.5); }
+    .flap { position: absolute; top: 0; left: 0; border-left: 130px solid transparent; border-right: 130px solid transparent; border-top: 90px solid #7d26b8; transform-origin: top; transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); z-index: 5; }
+    .envelope-body { position: absolute; inset: 0; border-left: 130px solid rgba(0,0,0,0.15); border-right: 130px solid rgba(0,0,0,0.15); border-bottom: 80px solid rgba(0,0,0,0.25); z-index: 6; pointer-events: none; border-radius: 8px; }
+    .env-heart { position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%); z-index: 4; font-size: 2.5rem; color: var(--magenta); filter: drop-shadow(0 0 10px var(--glow-magenta)); animation: pulse-env 1.5s infinite;}
+    .envelope-text { margin-top: 25px; font-size: 1.4rem; font-family: var(--font-display); color: var(--magenta); text-shadow: 0 0 15px var(--glow-magenta); animation: pulse-env 1.5s infinite; }
+    .envelope.open .flap { transform: rotateX(180deg); z-index: 3; }
+    @keyframes pulse-env { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.15); } }
+
+    .message-wrap { width: 100%; max-width: 500px; padding: 28px 24px; border-radius: 20px; display: none; }
+    .typewriter-text { font-size: 0.95rem; font-weight: 300; line-height: 1.85; min-height: 200px; }
+    .cursor { display: inline-block; width: 2px; height: 1.1em; background: var(--magenta); animation: blink 0.85s infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* UTILS & BUBBLES */
+    #music-btn { position: fixed; bottom: 24px; left: 20px; z-index: 200; width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--magenta)); border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: opacity 0.3s; }
+    #music-btn.visible { opacity: 1; }
+    .love-bubble { position: fixed; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 150; font-size: 1.3rem; pointer-events: auto; }
+    .bubble-msg { position: fixed; z-index: 160; color: #fff; font-weight: 600; font-size: 0.85rem; pointer-events: none; transform: translateX(-50%); text-align: center; background: linear-gradient(135deg, var(--purple), var(--magenta)); padding: 6px 14px; border-radius: 20px; box-shadow: 0 0 15px var(--glow-magenta); white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<div id="preloader">
+  <div class="preloader-heart"><i class="fas fa-heart"></i></div>
+  <p class="preloader-text">Loading our memories…</p>
+</div>
+
+<section class="screen" id="screen-lock">
+  <div class="glass" style="padding: 35px 25px; text-align: center; max-width: 400px; width: 90%; z-index: 10;">
+    <i class="fas fa-lock" style="font-size: 2.8rem; color: var(--magenta); margin-bottom: 15px; filter: drop-shadow(0 0 10px var(--glow-magenta));"></i>
+    <h2 style="font-size: 1.4rem; margin-bottom: 10px; font-weight: 600;">Enter the Secret Date 💜</h2>
+    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 25px;">අපේ ආදර කතාව පටන් ගත්තු ඒ විශේෂ දවස තෝරන්න මැණිකේ...</p>
+    <input type="date" id="anniversary-date" class="lock-input">
+    <button class="btn-primary" id="btn-unlock" style="width: 100%; justify-content: center;">
+      <span>Unlock Memories</span> <i class="fas fa-key"></i>
+    </button>
+    <p id="lock-error" style="color: #f87171; font-size: 0.85rem; margin-top: 15px; display: none; font-weight: 500;"></p>
+  </div>
+</section>
+
+<nav id="nav-dots">
+  <div class="nav-dot active" data-screen="1"></div>
+  <div class="nav-dot" data-screen="2"></div>
+  <div class="nav-dot" data-screen="3"></div>
+  <div class="nav-dot" data-screen="4"></div>
+  <div class="nav-dot" data-screen="5"></div>
+  <div class="nav-dot" data-screen="6"></div>
+  <div class="nav-dot" data-screen="7"></div>
+</nav>
+
+<button id="music-btn" aria-label="Toggle music"><i class="fas fa-music"></i></button>
+<audio id="bgm" loop preload="auto"><source src="bgm.mp3" type="audio/mpeg" /></audio>
+
+<div id="app">
+
+  <section class="screen" id="screen-1">
+    <div class="landing-badge">✦ March 25 → Forever ✦</div>
+    <h1 class="landing-title glow-text" id="landing-title">Happy 2nd Month<br /><span class="highlight">Chuti 💜</span></h1>
+    <p class="landing-subtitle">Two months of laughter, love, and endless joy. Here's to forever with you, my life. 🌙</p>
+    <div class="counter-row" id="counter-row">
+      <div class="counter-card glass"><span class="counter-num" id="c-days">00</span><span class="counter-label">Days</span></div>
+      <div class="counter-card glass"><span class="counter-num" id="c-hours">00</span><span class="counter-label">Hours</span></div>
+      <div class="counter-card glass"><span class="counter-num" id="c-mins">00</span><span class="counter-label">Mins</span></div>
+      <div class="counter-card glass"><span class="counter-num" id="c-secs">00</span><span class="counter-label">Secs</span></div>
+    </div>
+    <button class="btn-primary" id="btn-start" style="margin-top: 15px;"><span>Start Journey</span> <i class="fas fa-arrow-right"></i></button>
+  </section>
+
+  <section class="screen" id="screen-2">
+    <div class="section-header">
+      <p style="font-size:0.75rem; color:var(--magenta); letter-spacing:0.2em; text-transform:uppercase;">✦ Our Journey ✦</p>
+      <h2 class="section-title glow-text">Our Story</h2>
+    </div>
+    <div class="timeline" id="timeline">
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-card glass"><p class="tl-date">Our Beginning</p><h3 class="tl-title">අහම්බෙන් මුණගැසීම ✨</h3><p class="tl-desc">Internship එක ගැන අහන්න ආපු ඔයා එක්ක Notes share කරගෙන හිමින් හිමින් කතා කරන්න ගත්තා. අන්තිමට ඒක ලස්සනම ආදර කතාවක් වුණා.</p><i class="fas fa-comment-dots tl-icon"></i></div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-card glass"><p class="tl-date">March 25, 2026</p><h3 class="tl-title">ආදරෙයි කිව්ව දවස 💜</h3><p class="tl-desc">මම චූටිට මගේ හිතේ තියෙන ආදරේ කිව්ව ඒ රෑ, ඔයත් මට ආදරෙයි කිව්වා. ඒක මගේ ජීවිතේ අහපු ලස්සනම වචන ටික.</p><i class="fas fa-heart tl-icon"></i></div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-card glass"><p class="tl-date">May 03, 2026</p><h3 class="tl-title">අපේ පළවෙනි හමුවීම 🌸</h3><p class="tl-desc">මගේ ඇස් දෙකට චූටිව හැබෑවටම දැක්ක ඒ දවස කවදාවත් අමතක වෙන්නේ නෑ. අපි දෙන්නටම ඒක මාරම ලස්සන දවසක්.</p><i class="fas fa-sun tl-icon"></i></div></div>
+    </div>
+    <button class="btn-primary" style="margin-top: 30px;" onclick="goTo(3)"><span>Go to Gallery</span> <i class="fas fa-images"></i></button>
+  </section>
+
+  <section class="screen" id="screen-3">
+    <div class="section-header">
+      <p style="font-size:0.75rem; color:var(--magenta); letter-spacing:0.2em; text-transform:uppercase;">✦ Our Memories ✦</p>
+      <h2 class="section-title glow-text">Gallery</h2>
+    </div>
+    <div class="swiper-container-wrap">
+      <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide glass"><img src="photo1.jpg" alt="1"><div class="slide-overlay"><span>Memory 01 💜</span></div></div>
+          <div class="swiper-slide glass"><img src="photo2.jpg" alt="2"><div class="slide-overlay"><span>Memory 02 💜</span></div></div>
+          <div class="swiper-slide glass"><img src="photo3.jpg" alt="3"><div class="slide-overlay"><span>Memory 03 💜</span></div></div>
+          <div class="swiper-slide glass"><img src="photo4.jpg" alt="4"><div class="slide-overlay"><span>Memory 04 💜</span></div></div>
+          <div class="swiper-slide glass"><img src="photo5.jpg" alt="5"><div class="slide-overlay"><span>Memory 05 💜</span></div></div>
+          <div class="swiper-slide glass"><img src="photo6.jpg" alt="6"><div class="slide-overlay"><span>Memory 06 💜</span></div></div>
+        </div>
+        <div class="swiper-pagination"></div>
+      </div>
+    </div>
+    <button class="btn-primary" style="margin-top: 10px;" onclick="goTo(4)"><span>Security Check</span> <i class="fas fa-lock"></i></button>
+  </section>
+
+  <section class="screen" id="screen-4">
+    <div class="section-header">
+      <p style="font-size:0.75rem; color:var(--magenta); letter-spacing:0.2em; text-transform:uppercase;">✦ Verification ✦</p>
+      <h2 class="section-title glow-text">Love Scanner</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin-top:10px;">Place and hold your finger to verify you are my Soulmate! 👆</p>
+    </div>
+    
+    <div class="scanner-wrap">
+      <div class="fingerprint-btn" id="fp-btn">
+        <i class="fas fa-fingerprint"></i>
+        <div class="scan-line"></div>
+      </div>
+    </div>
+    
+    <h3 id="scan-status" style="margin-top:20px; color:var(--purple-light); font-weight:600; font-size:1.2rem; min-height:40px; text-align:center;">Hold to Scan...</h3>
+    
+    <button class="btn-primary" id="btn-after-scan" style="margin-top: 20px; display:none; opacity:0;" onclick="goTo(5)"><span>Proceed</span> <i class="fas fa-arrow-right"></i></button>
+  </section>
+
+  <section class="screen" id="screen-5">
+    <div class="section-header">
+      <p style="font-size:0.75rem; color:var(--magenta); letter-spacing:0.2em; text-transform:uppercase;">✦ Magic ✦</p>
+      <h2 class="section-title glow-text">Why I Love You 🎰</h2>
+    </div>
+
+    <div class="magic-ball-wrap">
+      <div class="magic-ball" id="magic-ball-btn">
+        <i class="fas fa-wand-magic-sparkles"></i>
+      </div>
+      <div class="reason-box glass" id="reason-display">
+        Tap the magic ball to see a reason... ✨
+      </div>
+    </div>
+    
+    <button class="btn-primary" style="margin-top: 35px;" onclick="goTo(6)"><span>Reveal My Gift</span> <i class="fas fa-gift"></i></button>
+  </section>
+
+  <section class="screen" id="screen-6">
+    <div class="section-header">
+      <p style="font-size:0.75rem; color:var(--magenta); letter-spacing:0.2em; text-transform:uppercase;">✦ Surprise ✦</p>
+      <h2 class="section-title glow-text">Your Gift 🎟️</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin-top:5px;">Scratch the card below to reveal your anniversary treat!</p>
+    </div>
+
+    <div class="scratch-card-wrapper">
+      <div class="scratch-base">
+        <h4>CONGRATULATIONS! 🎉</h4>
+        <h2 id="gift-text">Loading...</h2>
+      </div>
+      <canvas class="scratch-canvas" id="scratch-canvas" width="320" height="220"></canvas>
+    </div>
+
+    <button class="btn-primary" id="btn-after-scratch" style="margin-top: 20px; display:none; opacity:0;" onclick="goTo(7)"><span>Final Message</span> <i class="fas fa-envelope-open-text"></i></button>
+  </section>
+
+  <section class="screen" id="screen-7">
+    <div id="float-hearts" class="float-hearts"></div>
+    
+    <div id="envelope-wrap" class="envelope-wrapper">
+      <div class="envelope">
+        <div class="flap"></div>
+        <div class="envelope-body"></div>
+        <i class="fas fa-heart env-heart"></i>
+      </div>
+      <div class="envelope-text glow-text">Tap to Open 💌</div>
+    </div>
+
+    <div class="message-wrap glass" id="message-wrap-actual">
+      <p style="font-size:0.7rem; color:var(--magenta); letter-spacing:0.3em; text-transform:uppercase; margin-bottom:15px; text-align:center;">✦ Only For You ✦</p>
+      <h2 class="msg-header glow-text" style="font-family:var(--font-display); font-size:2.5rem; text-align:center; margin-bottom:15px;">Secret Message 💜</h2>
+      <div class="typewriter-text" id="typewriter"><span class="cursor"></span></div>
+      <div class="msg-footer" style="margin-top:20px; text-align:center; font-style:italic; font-size:0.85rem; color:var(--text-muted);">
+        <i class="fas fa-heart" style="color:var(--magenta)"></i> With all my love, always & forever <i class="fas fa-heart" style="color:var(--magenta)"></i>
+      </div>
+      
+      <div style="text-align: center; margin-top: 35px; z-index: 10; position: relative;">
+        <button class="btn-primary" onclick="goTo(1)"><i class="fas fa-redo-alt"></i> <span>අයෙත් මුලට යමු 💜</span></button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.js"></script>
+
+<script>
+const screens = [...document.querySelectorAll('.screen')];
+const navDots = [...document.querySelectorAll('.nav-dot')];
+let currentScreen = 1;
+let isAnimating = false;
+let playing = false;
+const musicBtn = document.getElementById('music-btn');
+const bgm = document.getElementById('bgm');
+
+/* FEATURE: GLOBAL TOUCH HEART BURST */
+document.addEventListener('pointerdown', (e) => {
+  // Prevent burst on specific interactive elements to keep it clean
+  if(e.target.closest('button') || e.target.closest('.nav-dot') || e.target.closest('.fingerprint-btn') || e.target.closest('.magic-ball') || e.target.tagName === 'CANVAS') return;
+
+  const emojis = ['💜', '💖', '✨', '🌸'];
+  for(let i=0; i<5; i++) {
+    const h = document.createElement('div');
+    h.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+    h.style.position = 'fixed'; h.style.left = (e.clientX - 10) + 'px'; h.style.top = (e.clientY - 10) + 'px';
+    h.style.pointerEvents = 'none'; h.style.zIndex = '99999';
+    h.style.fontSize = (Math.random() * 15 + 10) + 'px'; h.style.filter = 'drop-shadow(0 0 5px rgba(217,70,239,0.8))';
+    document.body.appendChild(h);
+    gsap.to(h, { x: (Math.random()-0.5)*120, y: (Math.random()-0.5)*120-40, opacity: 0, rotation: Math.random()*360, scale: Math.random()*1.5+0.5, duration: Math.random()*0.8+0.6, ease: 'power2.out', onComplete: () => h.remove() });
+  }
+});
+
+/* FEATURE: FLOATING BUBBLES */
+const loveMsgs = ["You are my world 🌍", "I love your smile 😍", "My Chuti Manike 💜", "Forever Yours ✨", "Miss you... 🥺"];
+setInterval(() => {
+  if(document.querySelectorAll('.love-bubble').length >= 3) return;
+  const b = document.createElement('div'); b.className = 'love-bubble glass';
+  b.style.left = Math.random() * 70 + 15 + '%'; b.style.bottom = '-60px';
+  b.innerHTML = '<i class="fas fa-heart" style="color:var(--magenta); filter:drop-shadow(0 0 5px var(--magenta));"></i>';
+  document.body.appendChild(b);
+  gsap.to(b, { y: -window.innerHeight - 100, x: '+=' + (Math.random()*100-50), rotation: Math.random()*90-45, duration: Math.random()*5+6, ease: 'linear', onComplete: () => b.remove() });
+
+  b.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    const msg = document.createElement('div'); msg.className = 'bubble-msg glow-text';
+    msg.innerText = loveMsgs[Math.floor(Math.random() * loveMsgs.length)];
+    msg.style.left = b.style.left; msg.style.top = b.getBoundingClientRect().top + 'px';
+    document.body.appendChild(msg);
+    gsap.fromTo(msg, {opacity: 0, scale: 0.5, y: 0}, {opacity: 1, scale: 1.1, y: -40, duration: 0.4, ease: 'back.out(1.7)'});
+    gsap.to(msg, {opacity: 0, y: -80, duration: 1, delay: 1.5, ease: 'power2.in', onComplete:()=>msg.remove()});
+    b.remove();
+  });
+}, 3500);
+
+/* LOCK SCREEN */
+document.getElementById('btn-unlock').addEventListener('click', () => {
+  if (document.getElementById('anniversary-date').value === '2026-03-25') {
+    document.getElementById('lock-error').style.display = 'none';
+    bgm.play().then(() => { musicBtn.classList.add('playing'); musicBtn.querySelector('i').className = 'fas fa-pause'; playing = true; }).catch(e=>{});
+    gsap.to('#screen-lock', { opacity: 0, scale: 0.95, duration: 0.6, onComplete: () => {
+      document.getElementById('screen-lock').classList.remove('active'); document.getElementById('screen-lock').style.display = 'none';
+      document.getElementById('screen-1').classList.add('active'); document.getElementById('nav-dots').classList.add('visible');
+      musicBtn.classList.add('visible'); triggerLandingAnimations();
+    }});
+  } else {
+    const err = document.getElementById('lock-error'); err.textContent = 'වැරදියි මැණිකේ... ආයෙත් දවස මතක් කරන්න! ❌'; err.style.display = 'block';
+    gsap.fromTo('#screen-lock .glass', { x: -10 }, { x: 0, duration: 0.08, repeat: 5, yoyo: true });
+  }
+});
+
+/* HUGE HEART BURST */
+function heartBurstTransition() {
+  const c = document.createElement('div'); c.style.position='fixed'; c.style.inset='0'; c.style.pointerEvents='none'; c.style.zIndex='9999'; document.body.appendChild(c);
+  for(let i=0; i<45; i++) {
+    const h = document.createElement('div'); h.innerHTML='💜'; h.style.position='absolute'; h.style.left=(Math.random()*100)+'vw'; h.style.top='-10vh';
+    h.style.fontSize=(Math.random()*25+15)+'px'; h.style.filter='drop-shadow(0 0 10px rgba(217,70,239,0.8))'; c.appendChild(h);
+    gsap.to(h, { y: window.innerHeight+150, x: '+='+(Math.random()*150-75), rotation: Math.random()*360, duration: Math.random()*1.5+1, ease: 'power1.in', onComplete:()=>h.remove() });
+  }
+  setTimeout(()=>c.remove(), 3000);
+}
+
+/* SPA ROUTING */
+function goTo(n) {
+  if (n === currentScreen || isAnimating) return;
+  isAnimating = true; heartBurstTransition();
+  const prev = document.getElementById(`screen-${currentScreen}`); const next = document.getElementById(`screen-${n}`);
+  const dir = n > currentScreen ? 1 : -1;
+
+  gsap.to(prev, { opacity: 0, y: dir * -40, duration: 0.4, ease: 'power2.in', onComplete: () => {
+      prev.classList.remove('active'); next.classList.add('active');
+      
+      // Reset Envelope if going to 7
+      if (n === 7) {
+         document.getElementById('envelope-wrap').style.display = 'block'; document.getElementById('envelope-wrap').style.opacity = '1';
+         document.querySelector('.envelope').classList.remove('open'); document.getElementById('message-wrap-actual').style.display = 'none';
+      }
+      // Initialize Scratch card if going to 6
+      if (n === 6) initScratchCard();
+
+      gsap.fromTo(next, { opacity: 0, y: dir * 50 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out', onComplete: () => {
+            isAnimating = false;
+            if (n === 2) animateTimeline();
+      }});
+  }});
+  currentScreen = n;
+  navDots.forEach((d, i) => d.classList.toggle('active', i + 1 === n));
+}
+navDots.forEach(d => d.addEventListener('click', () => goTo(+d.dataset.screen)));
+
+/* FEATURE 4: FINGERPRINT SCANNER */
+let scanTimer;
+let scanSuccess = false;
+const fpBtn = document.getElementById('fp-btn');
+const fpStatus = document.getElementById('scan-status');
+const btnAfterScan = document.getElementById('btn-after-scan');
+
+const startScan = (e) => {
+  if(scanSuccess) return;
+  e.preventDefault();
+  fpBtn.classList.add('scanning');
+  fpStatus.innerText = "Scanning Soulmate... 💓";
+  
+  scanTimer = setTimeout(() => {
+    scanSuccess = true;
+    fpBtn.classList.remove('scanning');
+    fpBtn.style.color = "var(--magenta)";
+    fpBtn.style.borderColor = "var(--magenta)";
+    fpBtn.innerHTML = '<i class="fas fa-check-circle"></i>';
+    fpStatus.innerHTML = "100% Perfect Match!<br>Soulmates Found! 💜";
+    
+    // Confetti and show next button
+    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+    btnAfterScan.style.display = 'inline-flex';
+    gsap.to(btnAfterScan, {opacity: 1, duration: 0.5});
+  }, 3000);
+};
+const stopScan = () => {
+  if(scanSuccess) return;
+  clearTimeout(scanTimer);
+  fpBtn.classList.remove('scanning');
+  fpStatus.innerText = "Hold to Scan... 👆";
+};
+fpBtn.addEventListener('mousedown', startScan);
+fpBtn.addEventListener('touchstart', startScan, {passive: false});
+window.addEventListener('mouseup', stopScan);
+window.addEventListener('touchend', stopScan);
+
+
+/* FEATURE 5: WHY I LOVE YOU GENERATOR */
+const reasons = [
+  "ඔයා හරිම ආදරණීය නිසා... 💜",
+  "මට ගොඩක් ආදරේ කරන නිසා... 🥺",
+  "මාව ගොඩක් විශ්වාස කරන නිසා... 🤝",
+  "ඔයා හරිම අවංක නිසා... 🌸",
+  "ඔයා හරිම අහිංසක නිසා... ✨",
+  "චූටි බිම්මලක් වගේ හුරතල් නිසා... 🍄",
+  "ලස්සන හුරුබුහුටි නිසා... 😍",
+  "මට අවංකවම ආදරේ කරන නිසා... 💍",
+  "මට මුකුත් හංගන්නේ නැතුව හැමදේම කියන නිසා... 🗣️",
+  "මං ගැන හොදට හොයලා බලන (caring) නිසා... 🤗",
+  "හැමදේටම දක්ෂ නිසා... 🏆",
+  "මාව හොදට තේරුම් ගන්න නිසා... 🧠",
+  "ඔයා මගේ ජීවිතේට ආපු ලොකුම වාසනාව නිසා... 🍀",
+  "ඔයාගෙ ලස්සන හිනාවට මං ආදරේ නිසා... 😊"
+];
+
+document.getElementById('magic-ball-btn').addEventListener('click', () => {
+  const display = document.getElementById('reason-display');
+  // Fade out
+  gsap.to(display, { opacity: 0, scale: 0.9, duration: 0.2, onComplete: () => {
+    // Pick random reason
+    let randomReason = reasons[Math.floor(Math.random() * reasons.length)];
+    // Make sure it doesn't repeat the exact same one immediately
+    while(display.innerText === randomReason) {
+      randomReason = reasons[Math.floor(Math.random() * reasons.length)];
+    }
+    display.innerText = randomReason;
+    // Fade in
+    gsap.to(display, { opacity: 1, scale: 1, duration: 0.3, ease: 'back.out(1.5)' });
+  }});
+  
+  // Little sparks from the ball
+  for(let i=0; i<3; i++){
+    const spark = document.createElement('div');
+    spark.innerHTML = '✨'; spark.style.position = 'absolute';
+    const rect = document.getElementById('magic-ball-btn').getBoundingClientRect();
+    spark.style.left = rect.left + rect.width/2 + 'px';
+    spark.style.top = rect.top + rect.height/2 + 'px';
+    spark.style.pointerEvents = 'none'; spark.style.zIndex = '99';
+    document.body.appendChild(spark);
+    gsap.to(spark, { x: (Math.random()-0.5)*150, y: (Math.random()-0.5)*150, opacity: 0, rotation: 180, duration: 0.8, onComplete: ()=>spark.remove() });
+  }
+});
+
+
+/* FEATURE 6: SCRATCH CARD */
+let scratchInitialized = false;
+function initScratchCard() {
+  if(scratchInitialized) return;
+  scratchInitialized = true;
+  
+  const gifts = [
+    "Romantic Movie Night 🎬", "An Unforgettable Dayout 🚗", "Grand Birthday Party 🎂",
+    "Beautiful Park Visit 🌸", "Romantic Beach Walk 🏖️", "Your Favorite Food Treat 🍕"
+  ];
+  document.getElementById('gift-text').innerText = gifts[Math.floor(Math.random() * gifts.length)];
+  
+  const canvas = document.getElementById('scratch-canvas');
+  const ctx = canvas.getContext('2d');
+  let isDrawing = false;
+  let isRevealed = false;
+
+  // Fill covering layer
+  ctx.fillStyle = '#1b0629'; // dark purple
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Add some pattern/text to overlay
+  ctx.fillStyle = '#d946ef';
+  ctx.font = 'bold 22px Poppins';
+  ctx.textAlign = 'center';
+  ctx.fillText('Scratch Me 🎁', canvas.width/2, canvas.height/2);
+  
+  // Draw random circles to make it look like a scratch card surface
+  for(let i=0; i<30; i++) {
+    ctx.beginPath();
+    ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*20+5, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(255, 255, 255, ${Math.random()*0.1})`;
+    ctx.fill();
+  }
+
+  const scratch = (e) => {
+    if (!isDrawing || isRevealed) return;
+    e.preventDefault(); // SUPER IMPORTANT FOR MOBILE: Stops scrolling!
+    
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    
+    // Scale coordinates based on actual canvas size vs rendered size
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
+
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(x, y, 22, 0, Math.PI * 2); // Brush size
+    ctx.fill();
+
+    if(Math.random() > 0.85) checkReveal();
+  };
+
+  const checkReveal = () => {
+    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    let clear = 0;
+    for(let i=3; i<pixels.length; i+=4) if(pixels[i] === 0) clear++;
+    
+    if(clear / (pixels.length/4) > 0.45) { // 45% cleared -> reveal all
+      isRevealed = true;
+      gsap.to(canvas, {opacity: 0, duration: 0.5, onComplete: () => {
+        canvas.style.display = 'none';
+        confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
+        const btn = document.getElementById('btn-after-scratch');
+        btn.style.display = 'inline-flex';
+        gsap.to(btn, {opacity: 1, duration: 0.5});
+      }});
+    }
+  };
+
+  canvas.addEventListener('mousedown', () => isDrawing = true);
+  canvas.addEventListener('touchstart', (e) => { isDrawing = true; e.preventDefault(); }, {passive: false});
+  window.addEventListener('mouseup', () => isDrawing = false);
+  window.addEventListener('touchend', () => isDrawing = false);
+  canvas.addEventListener('mousemove', scratch);
+  canvas.addEventListener('touchmove', scratch, {passive: false});
+}
+
+
+/* ENVELOPE OPEN LOGIC */
+document.getElementById('envelope-wrap').addEventListener('click', function() {
+  const envWrap = this; const envelope = document.querySelector('.envelope'); const msgWrap = document.getElementById('message-wrap-actual');
+  envelope.classList.add('open');
+  setTimeout(() => {
+     gsap.to(envWrap, { opacity: 0, y: 50, scale: 0.8, duration: 0.6, ease: 'power2.in', onComplete: () => {
+          envWrap.style.display = 'none'; msgWrap.style.display = 'block';
+          gsap.fromTo(msgWrap, {opacity: 0, y: 30, scale: 0.95}, {opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'back.out(1.5)'});
+          startTypewriter();
+       }
+     });
+  }, 800);
+});
+
+/* SWIPE LOGIC (Skipping interactive screens) */
+let touchStartY = 0;
+document.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive: true });
+document.addEventListener('touchend', e => {
+  // Prevent swipe navigation on screens where user needs to interact (2,3,4,5,6,7)
+  if (currentScreen !== 1) return; 
+  const dy = touchStartY - e.changedTouches[0].clientY;
+  if (dy > 60) goTo(currentScreen + 1);
+}, { passive: true });
+
+document.addEventListener('wheel', e => {
+  if (currentScreen !== 1 || isAnimating) return; 
+  if (e.deltaY > 50) goTo(currentScreen + 1);
+}, { passive: true });
+
+/* BACKGROUND PARTICLES */
+(function initParticles() {
+  const canvas = document.getElementById('particle-canvas'); const ctx = canvas.getContext('2d');
+  let W = canvas.width = window.innerWidth, H = canvas.height = window.innerHeight, particles = [];
+  window.addEventListener('resize', () => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; });
+  function Particle() { this.x = Math.random() * W; this.y = Math.random() * H; this.size = Math.random() * 12 + 10; this.speed = Math.random() * 1.5 + 0.5; this.angle = Math.random() * 360; this.spin = (Math.random() - 0.5) * 3; }
+  Particle.prototype.update = function() { this.y += this.speed; this.angle += this.spin; if (this.y > H + 30) { this.y = -30; this.x = Math.random() * W; } };
+  Particle.prototype.draw = function() { ctx.save(); ctx.translate(this.x, this.y); let scaleX = Math.sin(this.angle * Math.PI / 180); ctx.scale(scaleX, 1); ctx.font = this.size + 'px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.shadowColor = 'rgba(217, 70, 239, 0.6)'; ctx.shadowBlur = 8; ctx.globalAlpha = 0.6; ctx.fillText('💜', 0, 0); ctx.restore(); };
+  for(let i=0; i<30; i++) particles.push(new Particle());
+  function loop() { ctx.clearRect(0,0,W,H); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(loop); }
+  loop();
+})();
+
+/* TIMER */
+(function liveCounter() {
+  const start = new Date('2026-03-25T21:00:00');
+  function update() {
+    const diff = new Date() - start; if (diff < 0) return;
+    document.getElementById('c-days').textContent  = String(Math.floor(diff / 86400000)).padStart(2,'0');
+    document.getElementById('c-hours').textContent = String(Math.floor((diff % 86400000) / 3600000)).padStart(2,'0');
+    document.getElementById('c-mins').textContent  = String(Math.floor((diff % 3600000) / 60000)).padStart(2,'0');
+    document.getElementById('c-secs').textContent  = String(Math.floor((diff % 60000) / 1000)).padStart(2,'0');
+  } setInterval(update, 1000); update();
+})();
+
+/* PRELOADER HIDE */
+window.addEventListener('load', () => {
+  setTimeout(() => { document.getElementById('preloader').classList.add('hidden'); document.getElementById('screen-lock').classList.add('active'); }, 2200);
+});
+
+function triggerLandingAnimations() {
+  gsap.timeline().from('.landing-badge', { opacity: 0, y: -20, duration: 0.5 }).from('#landing-title', { opacity: 0, y: 20, scale: 0.95, duration: 0.7 }, '-=0.2').from('.landing-subtitle', { opacity: 0, duration: 0.5 }, '-=0.3').from('#counter-row', { opacity: 0, y: 15, duration: 0.5 }, '-=0.3');
+}
+
+function animateTimeline() { document.querySelectorAll('.tl-item').forEach((item, i) => { setTimeout(() => item.classList.add('visible'), i * 150); }); }
+
+/* SWIPER */
+new Swiper('.mySwiper', { effect: 'coverflow', grabCursor: true, centeredSlides: true, slidesPerView: 'auto', loop: true, speed: 1000, autoplay: { delay: 2500, disableOnInteraction: false }, coverflowEffect: { rotate: 35, stretch: 0, depth: 100, modifier: 1, slideShadows: true }, pagination: { el: '.swiper-pagination', clickable: true } });
+
+/* TYPEWRITER & FIREWORKS */
+function startTypewriter() {
+  document.getElementById('typewriter').innerHTML = '<span class="cursor"></span>';
+  const msg = `මගේ චූටි මැණිකේ... අදට අපි ආදරෙයි කියලා හරියටම මාස 2යි. අහම්බෙන් මුණගැහිලා, මගේ ජීවිතේට ආපු ඔයා, අද වෙද්දි මගේ මුළු ලෝකයම වෙලා ඉවරයි. හැමදාම රෑට පැය ගණන් ඔයා එක්ක Call එකෙන් කතා කරන එක දැන් මගේ ජීවිතේ ලොකුම පුරුද්දක් වෙලා චූටි 🥺. ඇස් දෙකෙන් දකින්නත් කලින් ඔයාට බැඳුණු මේ හිත, මැයි 3 වෙනිදා ඔයාව හැබෑවටම දැක්ක දවසේ තවත් පිස්සු වැටුණා. ඒක අපේ ජීවිතේ ලස්සනම දවස. මට විශ්වාසයි චූටි... කවදාහරි අපි දෙන්නා අනිවාර්යයෙන්ම විවාහ වෙලා, අපේ හැම අනාගත හීනයක්ම ජයගෙන මුළු ජීවිත කාලෙම ගොඩක් සතුටින් එකට ඉන්නවා. මං ඔයාට ගොඩක් ආදරෙයි මගේ චූටි මැණිකේ! 💜`;
+  const el = document.getElementById('typewriter'), cursor = el.querySelector('.cursor'); let i = 0;
+  function type() {
+    if (i < msg.length && currentScreen === 7) { 
+      el.insertBefore(document.createTextNode(msg[i++]), cursor); setTimeout(type, Math.random() * 50 + 30); 
+    } else if (i >= msg.length) { setTimeout(triggerFireworks, 500); }
+  }
+  setTimeout(type, 500); spawnFloatingHearts();
+}
+
+function triggerFireworks() {
+  const duration = 3 * 1000; const end = Date.now() + duration;
+  (function frame() {
+    confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#d946ef', '#bf5df0', '#f472b6', '#ffffff'] });
+    confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#d946ef', '#bf5df0', '#f472b6', '#ffffff'] });
+    if (Date.now() < end && currentScreen === 7) requestAnimationFrame(frame);
+  }());
+}
+
+function spawnFloatingHearts() {
+  const container = document.getElementById('float-hearts'), emojis = ['💜','✨','🌸','💝'];
+  const interval = setInterval(() => {
+    if(currentScreen !== 7) { clearInterval(interval); return; }
+    const h = document.createElement('span'); h.classList.add('fh'); h.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    h.style.left = Math.random() * 100 + '%'; h.style.bottom = '-10%'; h.style.fontSize = (Math.random() * 12 + 12) + 'px';
+    h.style.animationDuration = (Math.random() * 4 + 4) + 's'; container.appendChild(h); setTimeout(() => h.remove(), 6000);
+  }, 400);
+}
+
+/* MUSIC TOGGLE */
+musicBtn.addEventListener('click', () => { if (playing) { bgm.pause(); musicBtn.querySelector('i').className = 'fas fa-music'; } else { bgm.play(); musicBtn.querySelector('i').className = 'fas fa-pause'; } playing = !playing; });
+</script>
+</body>
+</html>
